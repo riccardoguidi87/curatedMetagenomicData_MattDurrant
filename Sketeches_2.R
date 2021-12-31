@@ -3,11 +3,13 @@
 # I confirmed there is lots of data in the published dataset
 # curate the table ready for merge
 
-# Metabolomic Table
-YachidaS_2019_SupplData13_1 <- read_excel("raw-data/YachidaS_2019_PMID31171880/41591_2019_458_MOESM3_ESM.xlsx",sheet = 18,skip = 3)
-names(YachidaS_2019_SupplData13_1)[1] <- "metabolite" 
+library(tidyverse)
+library(readxl)
 
-YachidaS_2019_SupplData13_2 <- YachidaS_2019_SupplData13_1 %>%
+# Metabolomic Table
+WirbelJ_2018_SupplDataMOESM3sh3_1 <- read_excel("raw-data/WirbelJ_2018_PMID30936547/41591_2019_406_MOESM3_ESM.xlsx",sheet = 3, skip = 18)
+
+WirbelJ_2018_SupplDataMOESM3sh3_2 <- YachidaS_2019_SupplData13_1 %>%
   pivot_longer(cols = !c("metabolite"), names_to = "Subject_ID") %>%
   select(Subject_ID, everything())
 
@@ -54,6 +56,60 @@ YachidaS_2019_SupplData1_2 %>%
   ggplot(aes(x=Stage,y=valueLOG10)) +
   geom_violin() +
   geom_jitter(size = 1)
+
+###
+
+GuptaA_2019_SupplData1_1 <- read_excel("raw-data/GuptaA_2019_PMID31719139/mSystems.00438-19-st001.xlsx", skip = 1)
+n<-dim(GuptaA_2019_SupplData1_1)[1]
+GuptaA_2019_SupplData1_2 <- GuptaA_2019_SupplData1_1[1:(n-2),] #remove last two empty rows
+
+# Adjust data type
+GuptaA_2019_SupplData1_3 <- GuptaA_2019_SupplData1_2 %>%
+  mutate(across(names(GuptaA_2019_SupplData1_2[,c(2,4,8:13)]), as.factor))
+
+# I have now a well formatted table
+
+GuptaA_2019_SupplData1_3
+
+# Visual
+
+GuptaA_2019_SupplData1_3 %>% 
+  
+  ggplot(aes(x=AGE,y=BMI)) +
+  geom_point()+
+  geom_smooth(method = lm)
+
+
+
+#####
+
+curatedmd_CRCnames
+
+var <- names(curatedmd)[-c(1:3)]
+
+toStringUnique <- function(vector) {
+  toString(unique(vector))
+}
+
+varSummaryTbl <- curatedmd %>%
+  filter(study_name %in% curatedmd_CRCnames) %>%
+  group_by(study_name) %>%
+  summarise(across(.col = var, .fns = toStringUnique)) %>%
+  ungroup() %>% 
+  select(!c(12:22)) %>% #remove columsn that are not clinical annotation values
+  
+  pivot_longer(cols = !c(study_name),names_to = "Variables") %>%
+  pivot_wider(names_from = study_name)
+
+
+  
+
+
+
+
+
+
+
 
 
 

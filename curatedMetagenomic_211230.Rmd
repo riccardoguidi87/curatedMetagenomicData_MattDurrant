@@ -1,0 +1,359 @@
+---
+title: "Clinical Metadata for curatedMetagenomic Projects"
+output: html_notebook
+---
+## BACKGROUND 
+The https://waldronlab.io/curatedMetagenomicData/ is a curated repository of organized metagenomic files from a group of cohorts with associated clinical data.
+
+We decided to use this data to look into CRC patients, their metagenomic data, and run Taxa- and BGC- on such files to expand the scope of our research into CRC. 
+
+### Is there a connection between CRC and a particular BGC?
+Connection between certain taxa and CRC is presently tenuous, and various depending on the study taken into consideration
+
+### How much clinical data is present in CRC studies?
+
+The "curatedMetagenomicData.tsv" is a file in https://waldronlab.io/curatedMetagenomicData/ that supposedly contains patient/sample level metagenomic values. 
+
+Here I take a look at "how much metadata" is actually there
+```{r}
+# dependencies
+library(tidyverse)
+library(readxl)
+
+# upload files and find levels of study conditions
+curatedmd <- read_tsv("raw-data/curatedMetagenomicData.tsv",show_col_types = FALSE)
+curatedmd$study_condition %>% unique()
+```
+CRC --> Colon Rectal Cancer, it is the only "lable" used for such disease
+
+What are the studies with associated CRC lable?
+```{r}
+curatedmd_CRCnames <- curatedmd %>%
+  filter(study_condition == "CRC") %>%
+  group_by(study_name) %>%
+  summarise(count = n()) %>% 
+  pivot_wider(names_from = study_name,values_from = count) %>% names()
+
+curatedmd_CRCnames
+```
+
+Only 11 studies have been tagged as CRC studies.
+How much *clinical* metadata is present in these studies?
+```{r}
+var <- names(curatedmd)[-c(1:3)]
+
+toStringUnique <- function(vector) {
+  toString(unique(vector))
+}
+
+varSummaryTbl <- curatedmd %>%
+  filter(study_name %in% curatedmd_CRCnames) %>%
+  group_by(study_name) %>%
+  summarise(across(.col = var, .fns = toStringUnique)) %>%
+  ungroup() %>% 
+  select(!c(12:22)) %>% #remove columsn that are not clinical annotation values
+  
+  pivot_longer(cols = !c(study_name),names_to = "Variables") %>%
+  pivot_wider(names_from = study_name)
+
+varSummaryTbl
+```
+By looking a the table above, there is a very little amount of clinical data here. There is no reference to responders and non-responders, for example, to medications, and many of the other clinical parameters are missing.
+
+### Presence of internal control cohorts in CRC studies
+clinical observational studies with internal control cohorts are considered better for biological interpretation. Therefore, I checked if any of the CRC studies have associated ctr samples, to include in the downstream analysis.
+
+Below is a complete list of studies that include internal control cohorts
+```{r message=FALSE, warning=FALSE}
+
+df1 <- curatedmd %>% 
+  group_by(study_name,study_condition) %>%
+  summarise(count = n()) %>%
+  select(study_name)
+vec <- df1$study_name
+studyNamesWithCtr <- vec[ave(seq_along(vec), vec, FUN = length)>1] %>% unique()
+
+studyNamesWithCtr
+```
+sanity check to make sure the list is accurate
+```{r message=FALSE, warning=FALSE}
+df %>%
+  group_by(study_name,study_condition) %>%
+  summarise(count = n()) %>%
+  filter(study_name == studyNamesWithCtr[1])
+```
+
+Lastly, check if any of these are CRC studies
+```{r message=FALSE, warning=FALSE}
+studiesCRCwithCtr <- df %>%
+  group_by(study_name,study_condition) %>%
+  summarise(count = n()) %>%
+  filter(study_name %in% studyNamesWithCtr[1:length(studyNamesWithCtr)]) %>%
+  filter(study_condition == "CRC")
+
+write_csv(studiesCRCwithCtr,"curated-data/studiesCRCwithCtr.csv")
+
+studiesCRCwithCtr
+```
+🔴 **CONCLUSIONS**: All 11 of the CRC studies have internal cohorts as control
+
+## Explore metadata directly from the publication
+The lack on clinically-relevant metadata in the curatedMetagenomicData doesn't necessary mean that this data is missing. **I looked into each of the original publications** to see if they contain any annotation we can incorporate in the our database.
+
+Below is a manual annotation ofregarding the presence or absence of metadata in each study
+
+**FengQ_2015**              --> Original Article, patient-level data found 	
+
+**GuptaA_2019**             --> Original Article, patient-level data found
+
+**HanniganGD_2017**         --> Original Article, patient-level data found
+
+**ThomasAM_2018ab_2019c**	  --> meta-analysis of five publicly available datasets (to dig in)
+  - new ita cohort 1 (metadata should be in curatedMetagenomicData) --> not seen under "ThomasAM_2018a"
+  - new ita cohort 2 (metadata should be in curatedMetagenomicData) --> not seen under "ThomasAM_2018a"
+  - Validation Cohort1 is available in the European Nucleotide Archive under the study identifier PRJEB27928
+  - Validation Cohort2 is available in the DNA data bank of Japan databases under the accession No. DRA006684
+
+**VogtmannE_2016**    		--> Original Work, patient-level data not available	
+
+**WirbelJ_2018**			    --> Meta-analysis:
+  - four published studies which used fecal shotgun metagenomics to characterize CRC patients compared to healthy controls
+  - An additional fifth population was generated from samples collected in Germany (herein abbreviated as DE); a subset of samples from this patient collective were published previously
+  - Metadata for all the studies in this meta-analyysis are found in the original paper and downloaded here
+
+**YachidaS_2019**		       --> Found, with additional metabolomic
+
+**YuJ_2015**	             --> data are available only aggregated
+
+**Conclusions**: I was able to pull clinical data from 5 out of the 8 studies. I still need to work on ThomasAM data that seem to be scatter in different location.
+
+## WirbelJ_2018
+A folder in raw-data ewas created containn relaveant published tables that need to be curated for data exploration
+```{r}
+# Table from Supplementary
+WirbelJ_2018_SupplDataMOESM3sh3_1 <- read_excel("raw-data/WirbelJ_2018_PMID30936547/41591_2019_406_MOESM3_ESM.xlsx",sheet = 3, skip = 18)
+
+# Adjust data type
+WirbelJ_2018_SupplDataMOESM3sh3_2 <- WirbelJ_2018_SupplDataMOESM3sh3_1 %>%
+  mutate(across(names(WirbelJ_2018_SupplDataMOESM3sh3_1[,c(4,14)]), as.numeric)) %>%
+  mutate(across(names(WirbelJ_2018_SupplDataMOESM3sh3_1[,c(3,5:13,15,16)]), as.factor))
+
+# I have now a well formatted table
+WirbelJ_2018_SupplDataMOESM3sh3_2
+write_csv(WirbelJ_2018_SupplDataMOESM3sh3_2,"curated-data/WirbelJ_2018_SupplDataMOESM3sh3_2.csv")
+```
+
+## GuptaA_2019
+A folder in raw-data ewas created containn relaveant published tables that need to be curated for data exploration
+```{r}
+# I confirmed there is lots of data in the published dataset
+# curate the table ready for merge
+
+## Table from Supplementary Table 1
+GuptaA_2019_SupplData1_1 <- read_excel("raw-data/GuptaA_2019_PMID31719139/mSystems.00438-19-st001.xlsx", skip = 1)
+n<-dim(GuptaA_2019_SupplData1_1)[1]
+GuptaA_2019_SupplData1_2 <- GuptaA_2019_SupplData1_1[1:(n-2),] #remove last two empty rows
+
+# Adjust data type
+GuptaA_2019_SupplData1_3 <- GuptaA_2019_SupplData1_2 %>%
+  mutate(across(names(GuptaA_2019_SupplData1_2[,c(2,4,8:13)]), as.factor))
+
+# I have now a well formatted table
+GuptaA_2019_SupplData1_3
+write_csv(GuptaA_2019_SupplData1_3,"curated-data/GuptaA_2019_SupplData1_3.csv")
+```
+
+## HanniganGD_2017
+A folder in raw-data ewas created containn relaveant published tables that need to be curated for data exploration
+```{r}
+# patient metadata was obtained from github Hannigan_CRCVirome_mBio_2018/data/metadata/303030-metadata.tsv
+
+## Table from Supplementary
+HanniganGD_2017_SupplData1_1 <- read_csv("raw-data/HanniganGD_2017_PMID30459201/meta.csv",show_col_types = FALSE)
+
+# Adjust data type
+HanniganGD_2017_SupplData1_2 <- HanniganGD_2017_SupplData1_1 %>%
+  mutate(across(names(HanniganGD_2017_SupplData1_1[,c(1,5,6,8,9)]), as.factor))
+
+# I have now a well formatted table
+HanniganGD_2017_SupplData1_2
+write_csv(HanniganGD_2017_SupplData1_2,"curated-data/HanniganGD_2017_SupplData1_2.csv")
+
+```
+## YachidaS_2019
+A folder in raw-data was created contain relaveant published tables that need to be curated for data exploration. 
+
+This publication provides both clinical data as well as metabolomic data (count). Two tables, each containing cliincal data, were merged into one
+
+```{r}
+## First Table comes from Sheet 4 (Clinical data)
+YachidaS_2019_SupplData2_1 <- read_excel("raw-data/YachidaS_2019_PMID31171880/41591_2019_458_MOESM3_ESM.xlsx",sheet = 4,skip = 2)
+
+newHeader <- str_replace(string = names(YachidaS_2019_SupplData2_1),pattern = "[[:space:]]",replacement = "")
+names(YachidaS_2019_SupplData2_1) <- newHeader
+
+YachidaS_2019_SupplData2_2 <- YachidaS_2019_SupplData2_1 %>%
+  mutate(across(names(YachidaS_2019_SupplData2_1[,2:3]), as.factor)) %>%
+  mutate(across(names(YachidaS_2019_SupplData2_1[,5]), as.factor)) %>%
+  mutate(across(names(YachidaS_2019_SupplData2_1[,6:8]), as.numeric)) %>%
+  mutate(across(names(YachidaS_2019_SupplData2_1[,9]), as.factor))
+
+# I have now a well formatted table
+YachidaS_2019_SupplData2_2
+
+## Second Table comes from Sheet 5 (metabolomics)
+YachidaS_2019_SupplData3_1 <- read_excel("raw-data/YachidaS_2019_PMID31171880/41591_2019_458_MOESM3_ESM.xlsx",sheet = 5, skip = 2)
+
+newHeader <- str_replace(string = names(YachidaS_2019_SupplData3_1),pattern = "[[:space:]]",replacement = "")
+names(YachidaS_2019_SupplData3_1) <- newHeader
+
+YachidaS_2019_SupplData3_2 <- YachidaS_2019_SupplData3_1 %>%
+  mutate(across(names(YachidaS_2019_SupplData2_1[,1]), as.character)) %>%
+  mutate(across(names(YachidaS_2019_SupplData3_1[,2:3]), as.factor)) %>%
+  mutate(across(names(YachidaS_2019_SupplData3_1[,5]), as.factor)) %>%
+  mutate(across(names(YachidaS_2019_SupplData3_1[,6:8]), as.numeric)) %>%
+  mutate(across(names(YachidaS_2019_SupplData3_1[,9]), as.factor))
+
+# I have now a well formatted table
+YachidaS_2019_SupplData3_2
+
+# bind
+YachidaS_2019_SupplData1_1 <- bind_rows(YachidaS_2019_SupplData2_2,YachidaS_2019_SupplData3_2)
+YachidaS_2019_SupplData1_1
+write_csv(YachidaS_2019_SupplData1_1,"curated-data/YachidaS_2019_SupplData1_1.csv")
+```
+
+This study also comes with **metabolomic** data, per patient!
+
+```{r}
+## This is a Metabolomic Table
+YachidaS_2019_SupplData13_1 <- read_excel("raw-data/YachidaS_2019_PMID31171880/41591_2019_458_MOESM3_ESM.xlsx",sheet = 18,skip = 3)
+names(YachidaS_2019_SupplData13_1)[1] <- "metabolite" 
+
+YachidaS_2019_SupplData13_2 <- YachidaS_2019_SupplData13_1 %>%
+  pivot_longer(cols = !c("metabolite"), names_to = "Subject_ID") %>%
+  select(Subject_ID, everything())
+
+# I have now a well formatted table
+YachidaS_2019_SupplData13_2
+write_csv(YachidaS_2019_SupplData13_2,"curated-data/YachidaS_2019_SupplData13_2.csv")
+```
+
+Merge metabolomic table with clinical annotation using Subject_ID as reference 
+
+```{r}
+YachidaS_2019_SupplData1_2 <- inner_join(YachidaS_2019_SupplData1_1,YachidaS_2019_SupplData13_2,by="Subject_ID")
+YachidaS_2019_SupplData1_2
+
+write_csv(YachidaS_2019_SupplData1_2,"curated-data/YachidaS_2019_SupplData1_2.csv")
+
+
+```
+
+Visualization of relevant metabolites (higher mean value than 10)
+
+```{r}
+# Distribution of matabolites
+relevantMetab <- YachidaS_2019_SupplData1_2 %>%
+  select(metabolite,value) %>%
+  group_by(metabolite) %>%
+  summarise(mean = mean(value)) %>%
+  filter(mean >= 10) %>% 
+  pivot_wider(names_from = metabolite, values_from = mean) %>% names()
+  
+p1 <- YachidaS_2019_SupplData1_2 %>%
+  filter(metabolite %in% relevantMetab) %>%
+  mutate(valueLOG10 = log10(value)) %>%
+  
+  ggplot(aes(x=metabolite,y=valueLOG10)) +
+  geom_boxplot(outlier.shape = NA) +
+  theme_bw()+
+  theme(axis.text.x = element_blank())
+
+p1
+```
+Do any of these metabolites correlate with tumor Stage?
+
+```{r message=FALSE, warning=FALSE}
+# Does any of these metabolites correlate with tumour stage?
+p2 <- YachidaS_2019_SupplData1_2 %>%
+  filter(metabolite %in% relevantMetab) %>%
+  mutate(valueLOG10 = log10(value)) %>%
+  filter(metabolite == "C06423_Octanoate") %>%
+
+  ggplot(aes(x=Stage,y=valueLOG10)) +
+  geom_violin() +
+  geom_jitter(size = 1)
+
+p2
+
+# Does any of these metabolites correlate with Age?
+p3 <- YachidaS_2019_SupplData1_2 %>%
+  filter(metabolite %in% relevantMetab) %>%
+  mutate(valueLOG10 = log10(value)) %>%
+  filter(metabolite == "C06423_Octanoate") %>%
+
+  ggplot(aes(x=Age,y=valueLOG10)) +
+  geom_point() +
+  geom_smooth(method='lm',na.rm=TRUE)
+
+p3
+```
+
+## FengQ_2015 
+A folder in raw-data ewas created containn relaveant published tables that need to be curated for data exploration
+
+```{r message=FALSE, warning=FALSE}
+
+# Table from Supplementary material of the manuscripot
+mdFengQ_2015_SupplData1_1 <- read_excel("raw-data/FengQ_2015_PMID25758642/41467_2015_BFncomms7528_MOESM1193_ESM.xlsx",
+                                        skip = 2)
+                                        
+newHeader <- str_replace(string = names(mdFengQ_2015_SupplData1_1),pattern = "\\.\\.\\..+",replacement = "")
+
+for (i in 1:length(newHeader)){
+  hold <- newHeader[i]
+  if (newHeader[i+1] == ""){
+    newHeader[i+1] <- hold
+  }
+  # break check
+  if (i==51) break
+}
+
+names(mdFengQ_2015_SupplData1_1) <- paste0(newHeader,"_",mdFengQ_2015_SupplData1_1[1,])
+mdFengQ_2015_SupplData1_2 <- mdFengQ_2015_SupplData1_1[-1,]
+
+names(mdFengQ_2015_SupplData1_2)[48] <- "MLG classifier_Type_Probability of carcinoma"
+names(mdFengQ_2015_SupplData1_2)[50] <- "MLG classifier_Type_Probability of advanced adenoma"
+names(mdFengQ_2015_SupplData1_2)[52] <- "MLG classifier_Type_Probability of advanced adenoma add age"
+names(mdFengQ_2015_SupplData1_2)[1] <- "Sample ID"
+
+names(mdFengQ_2015_SupplData1_2) <- str_replace_all(string = names(mdFengQ_2015_SupplData1_2),pattern = "[[:space:]]|\\(|\\/|\\)|\\:",replacement = "_")
+
+mdFengQ_2015_SupplData1_3 <- mdFengQ_2015_SupplData1_2 %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,3:25]), as.integer)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,26:31]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,32:38]), as.integer)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,39:46]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,47]), as.numeric)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,48]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,49]), as.numeric)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_2[,40]), as.factor))
+
+mdFengQ_2015_SupplData1_3 <- mdFengQ_2015_SupplData1_3 %>%
+  mutate(Clinical_data_State = factor(Clinical_data_State, levels=c("controls", "advanced adenoma","carcinoma")))
+
+#edit tables as some muberic are actually factors
+mdFengQ_2015_SupplData1_4 <- mdFengQ_2015_SupplData1_3 %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_3[,7:9]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_3[,16:17]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_3[,24:37]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_3[,39:46]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_3[,48]), as.factor)) %>%
+  mutate(across(names(mdFengQ_2015_SupplData1_3[,50]), as.factor))
+
+# I have now a well formatted table
+mdFengQ_2015_SupplData1_4
+write_csv(mdFengQ_2015_SupplData1_4,"curated-data/mdFengQ_2015_SupplData1_4.csv")
+
+```
