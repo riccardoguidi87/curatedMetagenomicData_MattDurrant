@@ -1,0 +1,103 @@
+---
+title: "Metadata_BARUCH_etal"
+author: "Riccardo Guidi"
+date: "1/4/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Metadata from BARUCH et al
+Paper info:
+Title: Fecal microbiota transplant promotes response in immunotherapy-refractory melanoma patients
+DOI: https://www.science.org/doi/10.1126/science.abb5920
+
+I manually produced a table that collect all the clinical infomration present in the paper, the majority of which were actually saved as PDF.  
+
+## Is there presence of any Clinical annotation of patients?
+Barush et al have some clinically annotated material that was transcribed manually into a single table (see relative folder)
+
+```{r}
+library(tidyverse)
+df <- read_csv("raw-data/Baruch_2021/clinicalData.csv")
+df
+
+```
+
+## Is there presence of any other metadata from the paper?
+
+### FACS
+No FACS data in manuscript
+### RNA-Seq
+16sRNA-Seq and Metagenome Seq (this concerns ComptTeam)
+
+> **RNA sequencing analysis** was based on FFPE material from the recipient biopsies. Prior to each biopsy block sectioning, the microtome was meticulously cleaned using a 70% ethanol solution followed by RNAase AWAY™ spray (Thermo Fischer, USA), and the water in the water plate were replaced. All gut and tumor biopsy blocks were sectioned 10 times, each section was 6μm thick. An expert pathologist (I.B.) reviewedthe H&E slides of each of the tumor biopsies to assess for the presence of healthy tissue. Healthy tissues were present in part of the pre-treatment sample of Recipient#3 and the post-treatment sample of Recipient#1. For those two patients, the tumor area was marked on their respective H&E slides. Following the section process, the marked tumor area was grossly dissected using a scalpel (blade No. 15) into sterile 1.5mL vials. For other tumor and gut blocks, the entire FFPE materials were sectioned directly into sterile 1.5mL vials. Aseparate vial was used for each of the samples. The vials were sealed with parafilm and were kept in -80C until RNA extraction and sequencing. Sectioned FFPE samples could spend up to 6 months in deep freeze. For RNA extraction and sequencing, FFPE samples were shipped in -80C packages to OtogeneticsCorporation (Georgia, USA). Extraction of RNA from FFPE was conducted using RNeasy FFPE kit (Qiagen, The Netherlands). The integrity and purity of total RNA were assessedusing Agilent Bioanalyzer. cDNA library was generated using Illumina truseq stranded cDNA library preparation kit (Illumina,USA,Cat# 20020594) using 500 ng of total RNA. The quality, quantity, and size distribution of the Illumina libraries were determined using an Agilent Tapestation 2200. The libraries were then sequenced using an Illumina NovaSeq 6000 sequencer according to the standard protocols. Paired-end 150 nucleotide reads were generated and checked for data quality using FastQC version 0.11.2 (Babraham Institute, UK). The reads were trimmed using TrimGalore version 0.5.0 (Babraham Institute, UK) to remove the adapters and low-quality reads, as well as poly A tail and low-quality base pairs at the 3' ends of the reads. Reads of length shorter than 20 bp were removed from further analysis. Alignment of the trimmed fastq files to the human genome Hg38 (version 38.98) was performed via STAR version 2.6.0a (Cold Spring Harbor Laboratory, USA) usingthe following parameters 
+*STAR --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 -- outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.6 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes NH HI NM MD --outSAMtype BAM SortedByCoordinate.*
+Quantification of the gene expression was performed against Ensembl GTF (version 38.98) using STAR gene quantification mode.After read count tables were obtained for each sample, analysis was conducted using R studio version 1.1.463 (R version 3.5.1) according to standardLimma and edgeR packages workflow(57).Briefly, Ensembl IDs were matched with ENTREZ IDs, gene symbol and gene names using the Homo.sapiens package. Reads with Counts Per Million (CPM) valuesof 2 or less and readsthat appeared in only one sample were filtered out. Normalization was performed by the Trimmed Mean of M-values (TMM) method. Gene set testing was conducted using the Camera method. Gene sets databsewas the MSigDB C5 Gene Ontology (GO), which was downloaded from the Broad Institute website (http://software.broadinstitute.org/gsea/index.jsp) during November 2019. Threshold for statistically significant differed genes and gene sets was FDR≤0.05.
+
+The data was uploaded by Peter McCaffrey to VB AWS: s3://vbx1-data/baruch-1/
+GEO location of human RNA-Seq data: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE162436
+The GEO deposited data included a Series Matrix File, that I downloaded here, for the description of the samples
+/Users/riccardoguidi/Documents/GitHub/curatedMetagenomicData_MattDurrant/raw-data/Baruch_2021/RNA-Seq
+
+```{r}
+smdf <- read_tsv("raw-data/Baruch_2021/RNA-Seq/GSE162436_series_matrix_table.csv", skip = 32, name_repair = "universal")
+
+names(smdf)[1] <- sub(".","",names(smdf)[1])
+ 
+smdf_v2 <- smdf %>%
+  mutate(Sample_title = str_replace(Sample_title,"\\!", ""))
+smdf_v2
+
+```
+
+We also can fetched gene count already computed for **gut** and **TME** from patients
+
+```{r message=FALSE, warning=FALSE}
+library(readxl)
+# gene count
+gc_tme <- read_excel("raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_tumor_TMM_counts.xlsx")
+gc_gut <- read_excel("raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_gut_TMM_counts.xlsx")
+names(gc_tme)[1] <- "ensembl_gene_id"
+names(gc_gut)[1] <- "ensembl_gene_id"
+
+res <- read_csv("curated-data/bioMartEnsemblHsapiens.csv") #curated list of ENSMBLE gene names
+
+gc_tme_ann <- left_join(gc_tme,res, by = "ensembl_gene_id")
+gc_gut_ann <- left_join(gc_gut,res, by = "ensembl_gene_id")
+
+gc_tme_ann
+gc_gut_ann
+```
+
+Quick visual
+
+```{r}
+p1 <- gc_gut_ann %>%
+  mutate(geneID = external_gene_name, .before =  ensembl_gene_id) %>%
+  mutate(across(c(3:20),log10)) %>%
+  select(-last_col()) %>%
+  ggplot(aes(x = R3_gut_pre, y = R3_gut_post)) + 
+  geom_point(alpha = 0.1) +
+  theme_bw()
+
+p2 <- gc_tme_ann %>%
+  mutate(geneID = external_gene_name, .before =  ensembl_gene_id) %>%
+  mutate(across(c(3:20),log10)) %>%
+  select(-last_col()) %>%
+  ggplot(aes(x = R3_tumor_pre, y = R3_tumor_post)) + 
+  geom_point(alpha = 0.1) +
+  theme_bw()
+
+p1
+p2
+```
+
+### scRNA-Seq
+None executed
+### Proteomic
+None executed
+### Metabolomic
+None executed
+
+
