@@ -1,0 +1,405 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Metadata\_BARUCH\_etal},
+  pdfauthor={Riccardo Guidi},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Metadata\_BARUCH\_etal}
+\author{Riccardo Guidi}
+\date{1/4/2022}
+
+\begin{document}
+\maketitle
+
+\hypertarget{metadata-from-baruch-et-al}{%
+\section{Metadata from BARUCH et al}\label{metadata-from-baruch-et-al}}
+
+Paper info: Title: Fecal microbiota transplant promotes response in
+immunotherapy-refractory melanoma patients DOI:
+\url{https://www.science.org/doi/10.1126/science.abb5920}
+
+I manually produced a table that collect all the clinical infomration
+present in the paper, the majority of which were actually saved as PDF.
+
+\hypertarget{is-there-presence-of-any-clinical-annotation-of-patients}{%
+\subsection{Is there presence of any Clinical annotation of
+patients?}\label{is-there-presence-of-any-clinical-annotation-of-patients}}
+
+Barush et al have some clinically annotated material that was
+transcribed manually into a single table (see relative folder)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"raw{-}data/Baruch\_2021/clinicalData.csv"}\NormalTok{)}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 12 x 29
+##    Group  Patient   AGE Gender `BRAFV600E muta~ `Previous treatm~ `aPD1 therapy`
+##    <chr>    <dbl> <dbl> <chr>  <chr>            <chr>             <chr>         
+##  1 FMT d~       1    59 M      mutated          Vemurafenib       nivolumab     
+##  2 FMT d~       2    41 F      mutated          vemurafenic+Cobi~ nivolumab     
+##  3 FMT r~       1    66 F      mutated          D+T;Nivo.D+T rei~ <NA>          
+##  4 FMT r~       2    70 M      wt               Pembro;Ipi;Pembr~ <NA>          
+##  5 FMT r~       3    78 M      wt               Pembro            <NA>          
+##  6 FMT r~       4    69 F      wt               unclear           <NA>          
+##  7 FMT r~       5    66 M      wt               Ipi+Nivo          <NA>          
+##  8 FMT r~       6    33 M      mutated          unclear           <NA>          
+##  9 FMT r~       7    66 M      mutated          Pembro;D+T        <NA>          
+## 10 FMT r~       8    65 M      wt               Ipi+Nivo          <NA>          
+## 11 FMT r~       9    35 F      wt               Nivo;Ipi;Carbopl~ <NA>          
+## 12 FMT r~      10    44 M      wt               Ipi+Nivo          <NA>          
+## # ... with 22 more variables: Stage <chr>, numberofDiseaseSites <dbl>,
+## #   Time in CR <dbl>, baselineLDN <chr>, targetLesionDiameterSum(mm) <dbl>,
+## #   baselinePDL1posCells(%) <chr>, numbCyclesInPrevaPD1 <dbl>,
+## #   irAE_DuringPreviousTreatem <chr>, irAE_DuringCurrentTrial <chr>,
+## #   Response by RECIST1.1_atFirstImaging <chr>,
+## #   Response by iRECIST_atFirstImaging <chr>, bestResponse by iRECIS <chr>,
+## #   bestRespPrevPD1 <chr>, bestRespTrial <chr>, ...
+\end{verbatim}
+
+\hypertarget{is-there-presence-of-any-other-metadata-from-the-paper}{%
+\subsection{Is there presence of any other metadata from the
+paper?}\label{is-there-presence-of-any-other-metadata-from-the-paper}}
+
+\hypertarget{facs}{%
+\subsubsection{FACS}\label{facs}}
+
+No FACS data in manuscript
+
+\hypertarget{metagenomic}{%
+\subsubsection{Metagenomic}\label{metagenomic}}
+
+16S and WGS (this concerns ComptTeam)
+
+\hypertarget{human-genetic-and-rna-seq}{%
+\subsubsection{Human Genetic and
+RNA-Seq}\label{human-genetic-and-rna-seq}}
+
+\begin{quote}
+\textbf{Tissue Collection} Sigmoid colon biopsy was taken at day 0
+(before colonoscopy-delivered FMT) and day 31. Tumour metastasis was
+taken at baseline (before ICB and FMT) and on day 70.
+\end{quote}
+
+\begin{quote}
+\textbf{RNA sequencing analysis} was based on FFPE material from the
+recipient biopsies. Prior to each biopsy block sectioning, the microtome
+was meticulously cleaned using a 70\% ethanol solution followed by
+RNAase AWAY™ spray (Thermo Fischer, USA), and the water in the water
+plate were replaced. All gut and tumor biopsy blocks were sectioned 10
+times, each section was 6μm thick. An expert pathologist (I.B.)
+reviewedthe H\&E slides of each of the tumor biopsies to assess for the
+presence of healthy tissue. Healthy tissues were present in part of the
+pre-treatment sample of Recipient\#3 and the post-treatment sample of
+Recipient\#1. For those two patients, the tumor area was marked on their
+respective H\&E slides. Following the section process, the marked tumor
+area was grossly dissected using a scalpel (blade No.~15) into sterile
+1.5mL vials. For other tumor and gut blocks, the entire FFPE materials
+were sectioned directly into sterile 1.5mL vials. Aseparate vial was
+used for each of the samples. The vials were sealed with parafilm and
+were kept in -80C until RNA extraction and sequencing. Sectioned FFPE
+samples could spend up to 6 months in deep freeze. For RNA extraction
+and sequencing, FFPE samples were shipped in -80C packages to
+OtogeneticsCorporation (Georgia, USA). Extraction of RNA from FFPE was
+conducted using RNeasy FFPE kit (Qiagen, The Netherlands). The integrity
+and purity of total RNA were assessedusing Agilent Bioanalyzer. cDNA
+library was generated using Illumina truseq stranded cDNA library
+preparation kit (Illumina,USA,Cat\# 20020594) using 500 ng of total RNA.
+The quality, quantity, and size distribution of the Illumina libraries
+were determined using an Agilent Tapestation 2200. The libraries were
+then sequenced using an Illumina NovaSeq 6000 sequencer according to the
+standard protocols. Paired-end 150 nucleotide reads were generated and
+checked for data quality using FastQC version 0.11.2 (Babraham
+Institute, UK). The reads were trimmed using TrimGalore version 0.5.0
+(Babraham Institute, UK) to remove the adapters and low-quality reads,
+as well as poly A tail and low-quality base pairs at the 3' ends of the
+reads. Reads of length shorter than 20 bp were removed from further
+analysis. Alignment of the trimmed fastq files to the human genome Hg38
+(version 38.98) was performed via STAR version 2.6.0a (Cold Spring
+Harbor Laboratory, USA) usingthe following parameters \emph{STAR
+--outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin
+8 --alignSJDBoverhangMin 1 -- outFilterMismatchNmax 999
+--outFilterMismatchNoverLmax 0.6 --alignIntronMin 20 --alignIntronMax
+1000000 --alignMatesGapMax 1000000 --outSAMattributes NH HI NM MD
+--outSAMtype BAM SortedByCoordinate.} Quantification of the gene
+expression was performed against Ensembl GTF (version 38.98) using STAR
+gene quantification mode.After read count tables were obtained for each
+sample, analysis was conducted using R studio version 1.1.463 (R version
+3.5.1) according to standardLimma and edgeR packages
+workflow(57).Briefly, Ensembl IDs were matched with ENTREZ IDs, gene
+symbol and gene names using the Homo.sapiens package. Reads with Counts
+Per Million (CPM) valuesof 2 or less and readsthat appeared in only one
+sample were filtered out. Normalization was performed by the Trimmed
+Mean of M-values (TMM) method. Gene set testing was conducted using the
+Camera method. Gene sets databsewas the MSigDB C5 Gene Ontology (GO),
+which was downloaded from the Broad Institute website
+(\url{http://software.broadinstitute.org/gsea/index.jsp}) during
+November 2019. Threshold for statistically significant differed genes
+and gene sets was FDR≤0.05.
+\end{quote}
+
+The data was uploaded by Peter McCaffrey to VB AWS:
+s3://vbx1-data/baruch-1/ GEO location of human RNA-Seq data:
+\url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE162436} The
+GEO deposited data included a Series Matrix File, that I downloaded
+here, for the description of the samples
+/Users/riccardoguidi/Documents/GitHub/curatedMetagenomicData\_MattDurrant/raw-data/Baruch\_2021/RNA-Seq
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{smdf }\OtherTok{\textless{}{-}} \FunctionTok{read\_tsv}\NormalTok{(}\StringTok{"raw{-}data/Baruch\_2021/RNA{-}Seq/GSE162436\_series\_matrix\_table.csv"}\NormalTok{, }\AttributeTok{skip =} \DecValTok{32}\NormalTok{, }\AttributeTok{name\_repair =} \StringTok{"universal"}\NormalTok{)}
+
+\FunctionTok{names}\NormalTok{(smdf)[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{sub}\NormalTok{(}\StringTok{"."}\NormalTok{,}\StringTok{""}\NormalTok{,}\FunctionTok{names}\NormalTok{(smdf)[}\DecValTok{1}\NormalTok{])}
+ 
+\NormalTok{smdf\_v2 }\OtherTok{\textless{}{-}}\NormalTok{ smdf }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Sample\_title =} \FunctionTok{str\_replace}\NormalTok{(Sample\_title,}\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{!"}\NormalTok{, }\StringTok{""}\NormalTok{))}
+\NormalTok{smdf\_v2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 47 x 37
+##    Sample_title   R1.gut.pre   R1.gut.post  R3.gut.pre  R3.gut.post  R4.gut.pre 
+##    <chr>          <chr>        <chr>        <chr>       <chr>        <chr>      
+##  1 Sample_geo_ac~ GSM4952021   GSM4952022   GSM4952023  GSM4952024   GSM4952025 
+##  2 Sample_status  Public on D~ Public on D~ Public on ~ Public on D~ Public on ~
+##  3 Sample_submis~ Dec 01 2020  Dec 01 2020  Dec 01 2020 Dec 01 2020  Dec 01 2020
+##  4 Sample_last_u~ Dec 31 2020  Dec 31 2020  Dec 31 2020 Dec 31 2020  Dec 31 2020
+##  5 Sample_type    SRA          SRA          SRA         SRA          SRA        
+##  6 Sample_channe~ 1            1            1           1            1          
+##  7 Sample_source~ Sigmoid col~ Sigmoid col~ Sigmoid co~ Sigmoid col~ Sigmoid co~
+##  8 Sample_organi~ Homo sapiens Homo sapiens Homo sapie~ Homo sapiens Homo sapie~
+##  9 Sample_charac~ tissue: Sig~ tissue: Sig~ tissue: Si~ tissue: Sig~ tissue: Si~
+## 10 Sample_charac~ per vs post~ per vs post~ per vs pos~ per vs post~ per vs pos~
+## # ... with 37 more rows, and 31 more variables: R4.gut.post <chr>,
+## #   R5.gut.pre <chr>, R5.gut.post <chr>, R6.gut.pre <chr>, R6.gut.post <chr>,
+## #   R7.gut.pre <chr>, R7.gut.post <chr>, R8.gut.pre <chr>, R8.gut.post <chr>,
+## #   R9.gut.pre <chr>, R9.gut.post <chr>, R10.gut.pre <chr>, R10.gut.post <chr>,
+## #   R1.tumor.pre <chr>, R1.tumor.post <chr>, R3.tumor.pre <chr>,
+## #   R3.tumor.post <chr>, R4.tumor.pre <chr>, R4.tumor.post <chr>,
+## #   R5.tumor.pre <chr>, R5.tumor.post <chr>, R6.tumor.pre <chr>, ...
+\end{verbatim}
+
+We also can fetched gene count already computed for \textbf{gut} and
+\textbf{TME} from patients
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readxl)}
+\CommentTok{\# gene count}
+\NormalTok{gc\_tme }\OtherTok{\textless{}{-}} \FunctionTok{read\_excel}\NormalTok{(}\StringTok{"raw{-}data/Baruch\_2021/RNA{-}Seq/GSE162436\_stranded\_rev\_CPM2\_tumor\_TMM\_counts.xlsx"}\NormalTok{)}
+\NormalTok{gc\_gut }\OtherTok{\textless{}{-}} \FunctionTok{read\_excel}\NormalTok{(}\StringTok{"raw{-}data/Baruch\_2021/RNA{-}Seq/GSE162436\_stranded\_rev\_CPM2\_gut\_TMM\_counts.xlsx"}\NormalTok{)}
+\FunctionTok{names}\NormalTok{(gc\_tme)[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"ensembl\_gene\_id"}
+\FunctionTok{names}\NormalTok{(gc\_gut)[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"ensembl\_gene\_id"}
+
+\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"curated{-}data/bioMartEnsemblHsapiens.csv"}\NormalTok{) }\CommentTok{\#curated list of ENSMBLE gene names}
+
+\NormalTok{gc\_tme\_ann }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(gc\_tme,res, }\AttributeTok{by =} \StringTok{"ensembl\_gene\_id"}\NormalTok{)}
+\NormalTok{gc\_gut\_ann }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(gc\_gut,res, }\AttributeTok{by =} \StringTok{"ensembl\_gene\_id"}\NormalTok{)}
+
+\NormalTok{gc\_tme\_ann}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 16,548 x 20
+##    ensembl_gene_id R1_tumor_pre R1_tumor_post R3_tumor_pre R3_tumor_post
+##    <chr>                  <dbl>         <dbl>        <dbl>         <dbl>
+##  1 ENSG00000279457           30            22           14            13
+##  2 ENSG00000228794          286           247          178           145
+##  3 ENSG00000225880           31            24           18            17
+##  4 ENSG00000223764            4             1            4             9
+##  5 ENSG00000187634           13             9            0            15
+##  6 ENSG00000188976          394           373          475           397
+##  7 ENSG00000187961           74            56           84           100
+##  8 ENSG00000187583            7             3            2             4
+##  9 ENSG00000187642            3             2            0             0
+## 10 ENSG00000188290           22            17            5            17
+## # ... with 16,538 more rows, and 15 more variables: R4_tumor_pre <dbl>,
+## #   R4_tumor_post <dbl>, R5_tumor_pre <dbl>, R5_tumor_post <dbl>,
+## #   R6_tumor_pre <dbl>, R6_tumor_post <dbl>, R7_tumor_pre <dbl>,
+## #   R7_tumor_post <dbl>, R8_tumor_pre <dbl>, R8_tumor_post <dbl>,
+## #   R9_tumor_pre <dbl>, R9_tumor_post <dbl>, R10_tumor_pre <dbl>,
+## #   R10_tumor_post <dbl>, external_gene_name <chr>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gc\_gut\_ann}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 15,820 x 20
+##    ensembl_gene_id R1_gut_pre R1_gut_post R3_gut_pre R3_gut_post R4_gut_pre
+##    <chr>                <dbl>       <dbl>      <dbl>       <dbl>      <dbl>
+##  1 ENSG00000227232         10          12          4          10          5
+##  2 ENSG00000279457         14          27         12          18         13
+##  3 ENSG00000228794        187         153        204         176        205
+##  4 ENSG00000225880         27          24         14          28         12
+##  5 ENSG00000223764         32           8         35          52         36
+##  6 ENSG00000187634         47          54         74          47         77
+##  7 ENSG00000188976        202         249        269         242        282
+##  8 ENSG00000187961         37          32         53          32         21
+##  9 ENSG00000187583          7          10         20           6         17
+## 10 ENSG00000188290         31          32         30          31         31
+## # ... with 15,810 more rows, and 14 more variables: R4_gut_post <dbl>,
+## #   R5_gut_pre <dbl>, R5_gut_post <dbl>, R6_gut_pre <dbl>, R6_gut_post <dbl>,
+## #   R7_gut_pre <dbl>, R7_gut_post <dbl>, R8_gut_pre <dbl>, R8_gut_post <dbl>,
+## #   R9_gut_pre <dbl>, R9_gut_post <dbl>, R10_gut_pre <dbl>, R10_gut_post <dbl>,
+## #   external_gene_name <chr>
+\end{verbatim}
+
+Quick visual
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p1 }\OtherTok{\textless{}{-}}\NormalTok{ gc\_gut\_ann }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{geneID =}\NormalTok{ external\_gene\_name, }\AttributeTok{.before =}\NormalTok{  ensembl\_gene\_id) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\FunctionTok{across}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{3}\SpecialCharTok{:}\DecValTok{20}\NormalTok{),log10)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{last\_col}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ R3\_gut\_pre, }\AttributeTok{y =}\NormalTok{ R3\_gut\_post)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{()}
+
+\NormalTok{p2 }\OtherTok{\textless{}{-}}\NormalTok{ gc\_tme\_ann }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{geneID =}\NormalTok{ external\_gene\_name, }\AttributeTok{.before =}\NormalTok{  ensembl\_gene\_id) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\FunctionTok{across}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{3}\SpecialCharTok{:}\DecValTok{20}\NormalTok{),log10)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{last\_col}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ R3\_tumor\_pre, }\AttributeTok{y =}\NormalTok{ R3\_tumor\_post)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{()}
+
+\NormalTok{p1}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{metadata_Baruch_2021_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p2}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{metadata_Baruch_2021_files/figure-latex/unnamed-chunk-4-2.pdf}
+
+\hypertarget{scrna-seq}{%
+\subsubsection{scRNA-Seq}\label{scrna-seq}}
+
+None executed
+
+\hypertarget{proteomic}{%
+\subsubsection{Proteomic}\label{proteomic}}
+
+None executed
+
+\hypertarget{metabolomic}{%
+\subsubsection{Metabolomic}\label{metabolomic}}
+
+None executed
+
+\end{document}
