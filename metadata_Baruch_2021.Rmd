@@ -12,15 +12,17 @@ Paper info:
 Title: Fecal microbiota transplant promotes response in immunotherapy-refractory melanoma patients
 DOI: https://www.science.org/doi/10.1126/science.abb5920
 
-I manually produced a table that collect all the clinical infomration present in the paper, the majority of which were actually saved as PDF.  
+I manually produced a table that collect all the clinical information present in the paper, the majority of which are presented as PDF.
 
-## Is there presence of any Clinical annotation of patients?
-Barush et al have some clinically annotated material that was transcribed manually into a single table (see relative folder)
+## Is there presence of any clinical annotation of patients?
+Barush et al have some clinically annotated material that was transcribed manually into a single table (see  folder)
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 df <- read_csv("raw-data/Baruch_2021/clinicalData.csv")
 df
+
+write_csv(df,"curated-data/Baruch_2021/Baruch_2021_clinicalMetadata_v1.csv")
 
 ```
 
@@ -32,7 +34,7 @@ No FACS data in manuscript
 
 ### Metagenomic
 
-16S and WGS  (this concerns ComptTeam)
+16S and WGS (this concerns ComptTeam)
 
 ### Human Genetic and RNA-Seq
 
