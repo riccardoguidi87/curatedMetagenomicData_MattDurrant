@@ -25,7 +25,7 @@ Clinical data include
 * TMB
 * PD-L1 staining value (binary: <1% >1%)
 
-Response (R) was defined by radiographic evidence of complete response, partial response or stable disease (for at least 6 months) per RECIST 1.1 criteria. 
+*From Method*: Response (R) was defined by radiographic evidence of complete response, partial response or stable disease (for at least 6 months) per RECIST 1.1 criteria. 
 Lack of a clinical response (non-responder, NR) was defined by disease progression (PD) on serial CT scans or stable disease lasting less than 6 months. Progression-free survival (PFS) was defined as the interval of time from treatment start to treatment progression (via scans or clinically determined) or the date of death. Otherwise patients were censored at the time of their last visit to the clinic through September 3, 2020 (date of follow-up assessment).
 
 ## Is there presence of any other metadata from the paper?

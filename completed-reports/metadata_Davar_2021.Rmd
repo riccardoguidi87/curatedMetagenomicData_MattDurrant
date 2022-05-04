@@ -3,8 +3,8 @@ title: "Metadata_Davar_2021"
 author: "Riccardo Guidi"
 date: "1/4/2022"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 # Metadata from 
