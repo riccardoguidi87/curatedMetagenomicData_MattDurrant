@@ -190,4 +190,3 @@ Legend:
 
 ### Future Perspective
 🔴 To evaluate other publications that may or may not be within the scope of CRC, but have large sample collecitons and are correlated with significant clinical and molecular metadata 
-
