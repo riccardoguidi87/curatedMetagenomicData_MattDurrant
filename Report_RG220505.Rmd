@@ -1,0 +1,193 @@
+---
+title: "Identification and Curation of Published studies for biomarker identification"
+output: html_notebook
+---
+
+## Chapter 1: CRC from _curatedMetadata_
+The https://waldronlab.io/curatedMetagenomicData/ is a curated repository of organized metagenomic files from a group of cohorts with associated clinical data. We decided to use this data to look into CRC patients, their metagenomic data, and run Taxa- and BGC - on such files to expand the scope of our research into CRC.
+
+### Is there a connection between CRC and a particular BGC?
+Connection between certain taxa and CRC is presently tenuous, and various depending on the study taken into consideration
+
+### How much clinical data is present in CRC studies?
+The "curatedMetagenomicData.tsv" is a file in https://waldronlab.io/curatedMetagenomicData/ that supposedly contains patient/sample level metagenomic values. 
+
+Here I take a look at "how much metadata" is actually there
+```{r}
+# dependencies
+library(tidyverse)
+library(readxl)
+
+# upload files and find levels of study conditions
+curatedmd <- read_tsv("raw-data/curatedMetagenomicData.tsv",show_col_types = FALSE)
+curatedmd$study_condition %>% unique()
+```
+CRC --> Colon Rectal Cancer, it is the only "lable" used for such disease
+
+What are the studies with associated CRC lable?
+```{r}
+curatedmd_CRCnames <- curatedmd %>%
+  filter(study_condition == "CRC") %>%
+  group_by(study_name) %>%
+  summarise(count = n()) %>% 
+  pivot_wider(names_from = study_name,values_from = count) %>% names()
+
+curatedmd_CRCnames
+```
+
+Only 11 studies have been tagged as CRC studies.
+How much *clinical* metadata is present in these studies?
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+var <- names(curatedmd)[-c(1:3)]
+
+toStringUnique <- function(vector) {
+  toString(unique(vector))
+}
+
+varSummaryTbl <- curatedmd %>%
+  filter(study_name %in% curatedmd_CRCnames) %>%
+  group_by(study_name) %>%
+  summarise(across(.col = var, .fns = toStringUnique)) %>%
+  ungroup() %>% 
+  select(!c(12:22)) %>% #remove columsn that are not clinical annotation values
+  
+  pivot_longer(cols = !c(study_name),names_to = "Variables") %>%
+  pivot_wider(names_from = study_name)
+
+varSummaryTbl
+```
+By looking a the table above, there is a very little amount of clinical data here. There is no reference to responders and non-responders, for example, to medications, and many of the other clinical parameters are missing.
+
+### Presence of internal control cohorts in CRC studies
+clinical observational studies with internal control cohorts are considered better for biological interpretation. Therefore, I checked if any of the CRC studies have associated ctr samples, to include in the downstream analysis.
+
+Below is a complete list of studies that include internal control cohorts
+```{r message=FALSE, warning=FALSE}
+df1 <- curatedmd %>% 
+  group_by(study_name,study_condition) %>%
+  summarise(count = n()) %>%
+  select(study_name)
+vec <- df1$study_name
+studyNamesWithCtr <- vec[ave(seq_along(vec), vec, FUN = length)>1] %>% unique()
+
+studyNamesWithCtr
+```
+sanity check to make sure the list is accurate
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+curatedmd %>%
+  group_by(study_name,study_condition) %>%
+  summarise(count = n()) %>%
+  filter(study_name == studyNamesWithCtr[1])
+```
+
+Lastly, check if any of these are CRC studies
+
+```{r message=FALSE, warning=FALSE}
+studiesCRCwithCtr <- curatedmd %>%
+  group_by(study_name,study_condition) %>%
+  summarise(count = n()) %>%
+  filter(study_name %in% studyNamesWithCtr[1:length(studyNamesWithCtr)]) %>%
+  filter(study_condition == "CRC")
+
+write_csv(studiesCRCwithCtr,"curated-data/studiesCRCwithCtr.csv")
+
+studiesCRCwithCtr
+```
+### CONCLUSIONS Part 1
+ 🔴 Each of the 11 CRC studies have internal cohorts as control, making it a good group of studies to investigate for presence of immunological metadata
+
+## Explore metadata directly from publication
+The lack on clinically-relevant metadata in the curatedMetagenomicData doesn't necessary mean that this data is missing. **I looked into each of the original publications** to see if they contain any annotation we can incorporate in the our database.
+
+Result of my investigation are the following:
+
+#### FengQ_2015
+This is an Original Article that published novel metagenomic data. The article contains a table with some clinical annotation, that were captured in a summary table (see Legend below). These data were NOT present in _curatedMetagenomicData_
+
+Legend:
+
+- FengQ_2015_1.csv: clinical metadata with "subject_id" as key column
+
+#### GuptaA_2019
+Original Article, patient-level data found. These data were not present in
+_curatedMetagenomicData_
+Legend:
+
+- GuptaA_2019_31719139_1.csv: clinical metadata with "subject_id" as key column
+
+#### HanniganGD_2017
+Original Article, patient-level data found
+
+Legend:
+- HanniganGD_2017_30459201_1.csv: clinical metadata with "subject_id" as key column
+
+#### ThomasAM_2018ab_2019c
+PMID: 30936548 This work is a meta-analysis of five publicly available datasets + two new cohorts + two "novel Validating Cohorts" 
+Cohort1: Ethics Committee of Azienda Ospedaliera ‘SS. Antonio e Biagio e C. Arrigo’ of Alessandria, Italy, protocol No. Colorectal_miRNA_CEC2014; 
+Cohort2: Ethics Committee of European Institute of Oncology of Milan, Italy, protocol No. R107/14-IEO 118
+  - new ITA Cohort1: clinical metadata not published and no reference to it in publication. May be missing
+  - new ITA Cohort2: clinical metadata not published and no reference to it in publication. May be missing
+  - Validation Cohort1 is available in the European Nucleotide Archive under the study identifier PRJEB27928 --> cannot find clinical metadata associated with this work
+  - Validation Cohort2 is available in the DNA data bank of Japan databases under the accession No. DRA006684 --> cannot find clinical metadata associated with this work
+  
+Legend:
+- No data table output
+
+#### VogtmannE_2016
+Original Work, but no patient-level data available	
+
+Legend:
+- No data table output
+
+#### WirbelJ_2018
+This work is a Meta-analysis that include some novel metagenomic data
+
+- four published studies which used fecal shotgun metagenomics to characterize CRC patients compared to healthy controls
+- An additional fifth population was generated from samples collected in Germany (herein abbreviated as DE); a subset of samples from this patient collective were published previously
+- Metadata for all the studies in this meta-analysis are found in the original paper and downloaded here
+
+Legend:
+
+- WirbelJ_2018_30936547_1.csv: clinical metadata with "subject_id" as key column
+
+#### YachidaS_2019
+Original Work, clinical metadata found
+Additionaly, metabolomic work was done. From papers' Method:
+
+*__Metabolome nalysis__ Quantitative analysis of charged metabolites by CETOFMS was performed as previously described (57). Fecal metabolites were extracted by vigorous shaking with methanol containing 20 µM each of methionine sulfone and d-camphol-10-sulfonic acid as the internal standards(58). All CETOFMS experiments were performed using an Agilent CE system. CE-TOFMS metabolome data were obtained for 517 compounds (Supplementary Table 3). For the analysis, concentrations below the detection limit were substituted with zero, and metabolites for which levels were below the detection limit in all of the samples were excluded. The metabolite profile is provided in Supplementary Table 13*
+
+Legend: 
+
+- YachidaS_2019_31171880_1.csv: clinical metadata with "subject_id" as key column
+- YachidaS_2019_31171880_2.csv: metabolomic data with clinical metadata with "subject_id" as key column
+
+#### YuJ_2015
+Original work, no patient-level data
+
+#### ZellerG_2014
+PMID 25432777 Original work, with patient-level data. 
+
+OBS: curatedMetagenomic data only has part of the full collection of original metagenomic samples present in the  publication. The publication has the following cohorts:
+
+- French cohort: present in curatedMetagenomic dataset
+- German cohort: absent from curatedMetagenomic dataset, but their seq data is available at European Nucleotide Archive (ENA) database (http://www.ebi.ac.uk/ena): accession number ERP005534
+- Danmark cohort: previously published (Qin et al., 2010 and Le Chatelier et al., 2013)
+- Spanish cohort: previously published (Qin et al., 2010)
+
+For clinical metadata annotation, will compile a metadata table including French and German cohort (only the novel cohorts)
+
+Legend:
+
+- ZellerG_2014_25432777_1.csv: clinical metadata with "SAMEA" as key colum to fetch the corresponding samples from ebi.ac.uk
+
+### CONCLUSIONS Part 2
+🔴I was able to pull clinical data from 6 out of the 9 studies
+
+🔴Although CRC is a relevant disease area, curatedMetagenomic dataset may not contain all of the best studies. For example: Jason lloyd-Price et al Nature 2019. 
+
+🔴The curated clinical metadata from these studies may be helpful to identify a significant correlation between BGCs and clinically relevant features.
+
+### Future Perspective
+🔴 To evaluate other publications that may or may not be within the scope of CRC, but have large sample collecitons and are correlated with significant clinical and molecular metadata 
+
