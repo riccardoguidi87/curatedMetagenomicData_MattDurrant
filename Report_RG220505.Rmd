@@ -1,6 +1,8 @@
 ---
 title: "Identification and Curation of Published studies for biomarker identification"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ## Chapter 1: CRC from _curatedMetadata_
