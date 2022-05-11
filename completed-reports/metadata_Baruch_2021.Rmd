@@ -14,14 +14,13 @@ DOI: https://www.science.org/doi/10.1126/science.abb5920
 
 I manually produced a table that collect all the clinical information present in the paper, the majority of which are presented as PDF.
 
-## Is there presence of any clinical annotation of patients?
+## Is there presence of any _clinical annotation_ of patients?
 Barush et al have some clinically annotated material that was transcribed manually into a single table (see  folder)
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
-df <- read_csv("raw-data/Baruch_2021/clinicalData.csv")
+df <- read_csv("../raw-data/Baruch_2021/clinicalData.csv")
 df
-
 write_csv(df,"curated-data/Baruch_2021/Baruch_2021_clinicalMetadata_v1.csv")
 
 ```
@@ -51,7 +50,7 @@ The GEO deposited data included a Series Matrix File, that I downloaded here, fo
 /Users/riccardoguidi/Documents/GitHub/curatedMetagenomicData_MattDurrant/raw-data/Baruch_2021/RNA-Seq
 
 ```{r message=FALSE, warning=FALSE}
-smdf <- read_tsv("raw-data/Baruch_2021/RNA-Seq/GSE162436_series_matrix_table.csv", skip = 32, name_repair = "universal")
+smdf <- read_tsv("../raw-data/Baruch_2021/RNA-Seq/GSE162436_series_matrix_table.csv", skip = 32, name_repair = "universal")
 
 names(smdf)[1] <- sub(".","",names(smdf)[1])
  
@@ -68,18 +67,18 @@ We also can fetched gene count already computed for **gut** and **TME** from pat
 ```{r message=FALSE, warning=FALSE}
 library(readxl)
 # gene count
-gc_tme <- read_excel("raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_tumor_TMM_counts.xlsx")
-gc_gut <- read_excel("raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_gut_TMM_counts.xlsx")
+gc_tme <- read_excel("../raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_tumor_TMM_counts.xlsx")
+gc_gut <- read_excel("../raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_gut_TMM_counts.xlsx")
 names(gc_tme)[1] <- "ensembl_gene_id"
 names(gc_gut)[1] <- "ensembl_gene_id"
 
-res <- read_csv("curated-data/bioMartEnsemblHsapiens.csv") #curated list of ENSMBLE gene names
+res <- read_csv("../curated-data/bioMartEnsemblHsapiens.csv") #curated list of ENSMBLE gene names
 
 gc_tme_ann <- left_join(gc_tme,res, by = "ensembl_gene_id")
 gc_gut_ann <- left_join(gc_gut,res, by = "ensembl_gene_id")
 
-write_csv(gc_tme_ann,"curated-data/Baruch_2021/RNA-Seq/geneCount_tme_ann.csv")
-write_csv(gc_gut_ann,"curated-data/Baruch_2021/RNA-Seq/geneCount_gut_ann.csv")
+write_csv(gc_tme_ann,"../curated-data/Baruch_2021/RNA-Seq/geneCount_tme_ann.csv")
+write_csv(gc_gut_ann,"../curated-data/Baruch_2021/RNA-Seq/geneCount_gut_ann.csv")
 
 gc_tme_ann
 gc_gut_ann
