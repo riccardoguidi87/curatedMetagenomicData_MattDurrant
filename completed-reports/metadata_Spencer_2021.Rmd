@@ -12,7 +12,7 @@ Paper info:
 Title: Dietary fiber and probiotics influence the gut microbiome and melanoma immunotherapy response
 DOI: https://www.science.org/doi/10.1126/science.aaz7015
 
-![image](spencer2021_1.png)
+![image](../spencer2021_1.png)
 
 ## Is there any _clinical_ annotation from patients?
 
@@ -28,11 +28,13 @@ Clinical data include
 *From Method*: Response (R) was defined by radiographic evidence of complete response, partial response or stable disease (for at least 6 months) per RECIST 1.1 criteria. 
 Lack of a clinical response (non-responder, NR) was defined by disease progression (PD) on serial CT scans or stable disease lasting less than 6 months. Progression-free survival (PFS) was defined as the interval of time from treatment start to treatment progression (via scans or clinically determined) or the date of death. Otherwise patients were censored at the time of their last visit to the clinic through September 3, 2020 (date of follow-up assessment).
 
+I ask Comp Team about data that may be coming from MD Anderson.
+
 ## Is there presence of any other metadata from the paper?
 
 ### FACS
 
-No FACS data on human samples
+No human data
 
 ### Metagenomic
 
@@ -44,13 +46,13 @@ Metagenomic data acquisition is done by Vastbiome CompTeam
 
 ### Human Genetic and RNA-Seq
 
-it appears that MD anderson perfoms a routine WGS on resected tumours to estimate global mutational burden
+It appears that MD Anderson performs a routine WGS on resected tumours to estimate global mutational burden
 
-> **TMB estimation in Lifestyle ICB cohort patients:** Data from targeted whole genome sequencing performed as part of routine clinical care at MD Anderson was abstracted from the medical record when available. Predicted tumor mutational burden (TMB) was derived from targeted whole genome sequencing data as previously described, usingan algorithm which calculates the predicted TMB using the weighted scores of specific genes mutated in a giventumor (44). TMB was classified as either high (≥100) or low (<100) predicted mutations as previously described (44).
+> **TMB estimation in Lifestyle ICB cohort patients:** Data from targeted whole genome sequencing performed as part of routine clinical care at MD Anderson was abstracted from the medical record when available. Predicted tumor mutational burden (TMB) was derived from targeted whole genome sequencing data as previously described, using an algorithm which calculates the predicted TMB using the weighted scores of specific genes mutated in a given tumor. TMB was classified as either high (≥100) or low (<100) predicted mutations as previously described (44).
 
 > **PD-L1 staining in Lifestyle ICB cohort patients:** For patients with available tumor tissue, tumor PD-L1 was quantified via immunohistochemical studies performed using the FDA approved Dako pharmDx PD-L1 (clone 28-8, Dako/Agilent Technologies, Carpinteria, CA) on Dako Autostainer Link 48 autostainer (Dako/Agilent Technologies, Carpinteria, CA) and antigen retrieval with PT Link with Target Retrieval Solution, low pH (Dako/Agilent Technologies, Carpinteria, CA) as specified by the manufacturer. PD-L1 was classified as ≥1% vs.<1%.
 
-Data could be collected for the TMB classification too, but need to be requested
+Data was obtained from MD-Anderson before VB presentation to them in February. Indentify table location with Comp Team.
 
 ### scRNA-Seq
 

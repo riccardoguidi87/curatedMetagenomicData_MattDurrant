@@ -2,10 +2,11 @@
 title: "Clinical Metadata for curatedMetagenomic Projects"
 output: html_notebook
 ---
+
 ## BACKGROUND 
 The https://waldronlab.io/curatedMetagenomicData/ is a curated repository of organized metagenomic files from a group of cohorts with associated clinical data.
 
-We decided to use this data to look into CRC patients, their metagenomic data, and run Taxa- and BGC- on such files to expand the scope of our research into CRC. 
+We decided to use this data to look into CRC patients, their metagenomic data, and run Taxa- and BGC - on such files to expand the scope of our research into CRC.
 
 ### Is there a connection between CRC and a particular BGC?
 Connection between certain taxa and CRC is presently tenuous, and various depending on the study taken into consideration
@@ -39,6 +40,7 @@ curatedmd_CRCnames
 
 Only 11 studies have been tagged as CRC studies.
 How much *clinical* metadata is present in these studies?
+
 ```{r}
 var <- names(curatedmd)[-c(1:3)]
 
@@ -65,7 +67,6 @@ clinical observational studies with internal control cohorts are considered bett
 
 Below is a complete list of studies that include internal control cohorts
 ```{r message=FALSE, warning=FALSE}
-
 df1 <- curatedmd %>% 
   group_by(study_name,study_condition) %>%
   summarise(count = n()) %>%
@@ -77,15 +78,16 @@ studyNamesWithCtr
 ```
 sanity check to make sure the list is accurate
 ```{r message=FALSE, warning=FALSE}
-df %>%
+curatedmd %>%
   group_by(study_name,study_condition) %>%
   summarise(count = n()) %>%
   filter(study_name == studyNamesWithCtr[1])
 ```
 
 Lastly, check if any of these are CRC studies
+
 ```{r message=FALSE, warning=FALSE}
-studiesCRCwithCtr <- df %>%
+studiesCRCwithCtr <- curatedmd %>%
   group_by(study_name,study_condition) %>%
   summarise(count = n()) %>%
   filter(study_name %in% studyNamesWithCtr[1:length(studyNamesWithCtr)]) %>%
@@ -100,35 +102,83 @@ studiesCRCwithCtr
 ## Explore metadata directly from the publication
 The lack on clinically-relevant metadata in the curatedMetagenomicData doesn't necessary mean that this data is missing. **I looked into each of the original publications** to see if they contain any annotation we can incorporate in the our database.
 
-Below is a manual annotation ofregarding the presence or absence of metadata in each study
+Below is a manual annotation regarding the presence or absence of metadata in each study
 
-**FengQ_2015**              --> Original Article, patient-level data found 	
+**FengQ_2015**
+This is an Original Article with published novel metagenomic data.
 
-**GuptaA_2019**             --> Original Article, patient-level data found
+Legend:
+FengQ_2015_1.csv: clinical metadata with "subject_id" as key column
 
-**HanniganGD_2017**         --> Original Article, patient-level data found
+**GuptaA_2019**
+Original Article, patient-level data found
 
-**ThomasAM_2018ab_2019c**	  --> meta-analysis of five publicly available datasets (to dig in)
-  - new ita cohort 1 (metadata should be in curatedMetagenomicData) --> not seen under "ThomasAM_2018a"
-  - new ita cohort 2 (metadata should be in curatedMetagenomicData) --> not seen under "ThomasAM_2018a"
-  - Validation Cohort1 is available in the European Nucleotide Archive under the study identifier PRJEB27928
-  - Validation Cohort2 is available in the DNA data bank of Japan databases under the accession No. DRA006684
+Legend:
+GuptaA_2019_31719139_1.csv: clinical metadata with "subject_id" as key column
 
-**VogtmannE_2016**    		--> Original Work, patient-level data not available	
+**HanniganGD_2017**
+Original Article, patient-level data found
 
-**WirbelJ_2018**			    --> Meta-analysis:
+Legend:
+HanniganGD_2017_30459201_1.csv: clinical metadata with "subject_id" as key column
+
+**ThomasAM_2018ab_2019c**	 PMID: 30936548 
+This work is a meta-analysis of five publicly available datasets + two new cohorts + two "novel Validating Cohorts" 
+Cohort1: Ethics Committee of Azienda Ospedaliera ‘SS. Antonio e Biagio e C. Arrigo’ of Alessandria, Italy, protocol No. Colorectal_miRNA_CEC2014; 
+Cohort2: Ethics Committee of European Institute of Oncology of Milan, Italy, protocol No. R107/14-IEO 118
+  - new ITA Cohort1: clinical metadata not published and no reference to it in publication. May be missing
+  - new ITA Cohort2: clinical metadata not published and no reference to it in publication. May be missing
+  - Validation Cohort1 is available in the European Nucleotide Archive under the study identifier PRJEB27928 --> cannot find clinical metadata associated with this work
+  - Validation Cohort2 is available in the DNA data bank of Japan databases under the accession No. DRA006684 --> cannot find clinical metadata associated with this work
+  
+Legend:
+No data table output
+
+**VogtmannE_2016**
+Original Work, patient-level data not available	
+
+Legend:
+No data table output
+
+**WirbelJ_2018**
+Meta-analysis:
   - four published studies which used fecal shotgun metagenomics to characterize CRC patients compared to healthy controls
   - An additional fifth population was generated from samples collected in Germany (herein abbreviated as DE); a subset of samples from this patient collective were published previously
-  - Metadata for all the studies in this meta-analyysis are found in the original paper and downloaded here
+  - Metadata for all the studies in this meta-analysis are found in the original paper and downloaded here
 
-**YachidaS_2019**		       --> Found, with additional metabolomic
+Legend:
+WirbelJ_2018_30936547_1.csv: clinical metadata with "subject_id" as key column
 
-**YuJ_2015**	             --> data are available only aggregated
+**YachidaS_2019**
+Original Work, clinical metadata found. 
+Additionaly, metabolomic work was done
 
-**Conclusions**: I was able to pull clinical data from 5 out of the 8 studies. I still need to work on ThomasAM data that seem to be scatter in different location.
+Legend
+YachidaS_2019_31171880_1.csv: clinical metadata with "subject_id" as key column
+YachidaS_2019_31171880_2.csv: metabolomic data with clinical metadata with "subject_id" as key column
+
+**YuJ_2015** 
+Original work, no patient-level data
+
+**ZellerG_2014**
+PMID 25432777
+Original work, with patient-level data
+OBS: curatedMetagenomic data only has part of the full collection of original metagenomic samples present in the  publication. The publication has the following cohorts:
+
+- French cohort: present in curatedMetagenomic dataset
+- German cohort: absent from curatedMetagenomic dataset, but their seq data is available at European Nucleotide Archive (ENA) database (http://www.ebi.ac.uk/ena): accession number ERP005534
+- Danmark cohort: previously published (Qin et al., 2010 and Le Chatelier et al., 2013)
+- Spanish cohort: previously published (Qin et al., 2010)
+
+For clinical metadata annotation, will compile a metadata table including French and German cohort (only the novel cohorts)
+
+Legend
+ZellerG_2014_25432777_1.csv: clinical metadata with "SAMEA" as key colum to fetch the corresponding samples from ebi.ac.uk
+
+🔴 **CONCLUSIONS**: I was able to pull clinical data from 6 out of the 9 studies
 
 ## WirbelJ_2018
-A folder in raw-data ewas created containn relaveant published tables that need to be curated for data exploration
+A folder in raw-data was created containg relaveant published tables that need to be curated for data exploration
 ```{r}
 # Table from Supplementary
 WirbelJ_2018_SupplDataMOESM3sh3_1 <- read_excel("raw-data/WirbelJ_2018_PMID30936547/41591_2019_406_MOESM3_ESM.xlsx",sheet = 3, skip = 18)
