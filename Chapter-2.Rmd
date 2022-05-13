@@ -1,0 +1,236 @@
+---
+title: "Chapeter 2: Metadata from ICB / Metabolomic Studies"
+output: html_notebook
+---
+
+We have identified three main works that study the relatioship between gut microbiome and ICB responsiveness.
+
+1) Baruch 2021
+2) Davar 2021
+3) Spencer 2021
+
+# Metadata from BARUCH et al
+Paper info:
+Title: Fecal microbiota transplant promotes response in immunotherapy-refractory melanoma patients
+DOI: https://www.science.org/doi/10.1126/science.abb5920
+Last Authors: Gal Markel, Ben Boursi 
+First Authior: Erez N. Baruch
+Main Affiliation: School of Medicine, Sackler Faculty of Medicine, Tel Aviv University, Tel Aviv, Israel.
+
+## Is there presence of any _clinical annotation_ of patients?
+Barush et al have some clinically annotated material that was transcribed manually into a single table (see  folder)
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+df <- read_csv("curated-data/Baruch_2021/Baruch_2021_clinicalMetadata_v1.csv")
+
+```
+
+## FACS
+
+No FACS data in manuscript
+
+### Metagenomic
+
+16S and WGS is found (gathering and organization of this data concern the CompTeam)
+
+### Human Genetic and RNA-Seq
+
+> **Tissue Collection** Sigmoid colon biopsy was taken at day 0 (before colonoscopy-delivered FMT) and day 31. Tumour metastasis was taken at baseline (before ICB and FMT) and on day 70.
+
+> **RNA sequencing analysis** was based on FFPE material from the recipient biopsies. Prior to each biopsy block sectioning, the microtome was meticulously cleaned using a 70% ethanol solution followed by RNAase AWAY™ spray (Thermo Fischer, USA), and the water in the water plate were replaced. All gut and tumor biopsy blocks were sectioned 10 times, each section was 6μm thick. An expert pathologist (I.B.) reviewedthe H&E slides of each of the tumor biopsies to assess for the presence of healthy tissue. Healthy tissues were present in part of the pre-treatment sample of Recipient#3 and the post-treatment sample of Recipient#1. For those two patients, the tumor area was marked on their respective H&E slides. Following the section process, the marked tumor area was grossly dissected using a scalpel (blade No. 15) into sterile 1.5mL vials. For other tumor and gut blocks, the entire FFPE materials were sectioned directly into sterile 1.5mL vials. Aseparate vial was used for each of the samples. The vials were sealed with parafilm and were kept in -80C until RNA extraction and sequencing. Sectioned FFPE samples could spend up to 6 months in deep freeze. For RNA extraction and sequencing, FFPE samples were shipped in -80C packages to OtogeneticsCorporation (Georgia, USA). Extraction of RNA from FFPE was conducted using RNeasy FFPE kit (Qiagen, The Netherlands). The integrity and purity of total RNA were assessedusing Agilent Bioanalyzer. cDNA library was generated using Illumina truseq stranded cDNA library preparation kit (Illumina,USA,Cat# 20020594) using 500 ng of total RNA. The quality, quantity, and size distribution of the Illumina libraries were determined using an Agilent Tapestation 2200. The libraries were then sequenced using an Illumina NovaSeq 6000 sequencer according to the standard protocols. Paired-end 150 nucleotide reads were generated and checked for data quality using FastQC version 0.11.2 (Babraham Institute, UK). The reads were trimmed using TrimGalore version 0.5.0 (Babraham Institute, UK) to remove the adapters and low-quality reads, as well as poly A tail and low-quality base pairs at the 3' ends of the reads. Reads of length shorter than 20 bp were removed from further analysis. Alignment of the trimmed fastq files to the human genome Hg38 (version 38.98) was performed via STAR version 2.6.0a (Cold Spring Harbor Laboratory, USA) usingthe following parameters 
+*STAR --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 -- outFilterMismatchNmax 999 --outFilterMismatchNoverLmax 0.6 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes NH HI NM MD --outSAMtype BAM SortedByCoordinate.*
+Quantification of the gene expression was performed against Ensembl GTF (version 38.98) using STAR gene quantification mode.After read count tables were obtained for each sample, analysis was conducted using R studio version 1.1.463 (R version 3.5.1) according to standardLimma and edgeR packages workflow(57).Briefly, Ensembl IDs were matched with ENTREZ IDs, gene symbol and gene names using the Homo.sapiens package. Reads with Counts Per Million (CPM) valuesof 2 or less and readsthat appeared in only one sample were filtered out. Normalization was performed by the Trimmed Mean of M-values (TMM) method. Gene set testing was conducted using the Camera method. Gene sets databsewas the MSigDB C5 Gene Ontology (GO), which was downloaded from the Broad Institute website (http://software.broadinstitute.org/gsea/index.jsp) during November 2019. Threshold for statistically significant differed genes and gene sets was FDR≤0.05.
+
+The data was uploaded by Peter McCaffrey to VB AWS: s3://vbx1-data/baruch-1/
+GEO location of human RNA-Seq data: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE162436
+
+The GEO deposited data included a Series Matrix File, that I downloaded here, for the description of the samples: /raw-data/Baruch_2021/RNA-Seq
+
+```{r message=FALSE, warning=FALSE}
+smdf <- read_tsv("../raw-data/Baruch_2021/RNA-Seq/GSE162436_series_matrix_table.csv", skip = 32, name_repair = "universal")
+
+names(smdf)[1] <- sub(".","",names(smdf)[1])
+ 
+smdf_v2 <- smdf %>%
+  mutate(Sample_title = str_replace(Sample_title,"\\!", ""))
+smdf_v2
+
+write_csv(smdf_v2,"curated-data/Baruch_2021/RNA-Seq/sampleMatrix.csv")
+
+df <- read_csv("curated-data/Baruch_2021/RNA-Seq/sampleMatrix.csv")
+
+```
+
+We also can fetched gene count already computed for **gut** and **TME** from patients
+
+```{r message=FALSE, warning=FALSE}
+library(readxl)
+# gene count
+gc_tme <- read_excel("../raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_tumor_TMM_counts.xlsx")
+gc_gut <- read_excel("../raw-data/Baruch_2021/RNA-Seq/GSE162436_stranded_rev_CPM2_gut_TMM_counts.xlsx")
+names(gc_tme)[1] <- "ensembl_gene_id"
+names(gc_gut)[1] <- "ensembl_gene_id"
+
+res <- read_csv("../curated-data/bioMartEnsemblHsapiens.csv") #curated list of ENSMBLE gene names
+
+gc_tme_ann <- left_join(gc_tme,res, by = "ensembl_gene_id")
+gc_gut_ann <- left_join(gc_gut,res, by = "ensembl_gene_id")
+
+write_csv(gc_tme_ann,"../curated-data/Baruch_2021/RNA-Seq/geneCount_tme_ann.csv")
+write_csv(gc_gut_ann,"../curated-data/Baruch_2021/RNA-Seq/geneCount_gut_ann.csv")
+
+gc_tme_ann
+gc_gut_ann
+
+```
+
+Quick visual
+
+```{r message=FALSE, warning=FALSE}
+p1 <- gc_gut_ann %>%
+  mutate(geneID = external_gene_name, .before =  ensembl_gene_id) %>%
+  mutate(across(c(3:20),log10)) %>%
+  select(-last_col()) %>%
+  ggplot(aes(x = R3_gut_pre, y = R3_gut_post)) + 
+  geom_point(alpha = 0.1) +
+  theme_bw()
+
+p2 <- gc_tme_ann %>%
+  mutate(geneID = external_gene_name, .before =  ensembl_gene_id) %>%
+  mutate(across(c(3:20),log10)) %>%
+  select(-last_col()) %>%
+  ggplot(aes(x = R3_tumor_pre, y = R3_tumor_post)) + 
+  geom_point(alpha = 0.1) +
+  theme_bw()
+
+p1
+p2
+```
+
+### scRNA-Seq
+
+None executed
+
+### Proteomic
+
+None executed
+
+### Metabolomic
+
+None executed
+
+# Metadata from Davar 2021
+Title: Fecal microbiota transplant overcomes resistance to anti–PD-1 therapy in melanoma patients
+DOI: https://www.readcube.com/library/8a504224-61e2-4024-844e-70a7f1c1ce52:4ba1f07e-2c26-402b-9abf-935a70566455
+Last Author: Giorgio Trinchieri, Hassane M. Zarour
+First Author: Diwakar Davar, Amiran K. Dzutsev
+Affiliation: Department of Medicine and UPMC Hillman Cancer Center, University of Pittsburgh, Pittsburgh, PA 15213, USA.
+
+## Is there any _clinical_ annotation from patients?
+
+Looking at SRA tables in NCBI, we find clinical metadata of patients
+
+```{r}
+library(tidyverse)
+df <- read_csv("raw-data/Davar_2021_PMID33542131/SraRunTable.csv")
+df
+write_csv(df,"curated-data/Davar_2021_PMID33542131/Davar_2021_cinicalMeta.csv")
+```
+
+## Is there presence of any other metadata from the paper?
+
+### FACS
+
+There are FACS analysis presented. 
+
+> **FACS method of patient PBMC** Multiparameter Flow Cytometry and Unsupervised Analysis of Peripheral Blood Mononuclear CellsCryopreserved peripheral blood mononuclear cells (PBMCs) from patients undergoing combined anti-PD-1 and FMT treatment at three time points (days 0, 21, and 42) were thawed, washed, and resuspended in complete Iscove’s Dulbecco’s Modified Eagle Medium (10% human serum, 1% penicillin and streptomycin, 1% L-glutamine, 1% Hepes, and 1% non-essential amino acids). Cells were equally divided into five staining panels(depicted below). Cells in each panel were labeled for viability with Zombie NIR (BioLegend, San Diego, CA, USA) (15min, room temperature) and stained with 29-color panels of anti-human monoclonal antibodies against surface (20 min, 4°C) and intracellular markers (30 min, 4°C). Cells were permeabilized in2% hypertonic formaldehyde for 20 min at room temperature, followed by 1X BD perm/wash buffer (BD Biosciences, Franklin Lakes, NJ, USA), per the manufacturer’s protocol. Each panel included a set of markers of interest and a common core of lineage markers. The antibodies used are outlined in the table below and include: CD1a and CXCR-5 BUV395, CD16 BUV496, CD123 and CD25 BUV563, CD56 BUV661, CD19 and CD8 BUV737, CD14 and CD127 BUV805 (BD Biosciences), CD86 and TIGIT BV421 (BD Biosciences), IgD, CD27 and ICOS SuperBright436 (Thermo Fisher Scientific, Waltham, MA, USA), CD27, HLA-DR and Helios Pacific Blue, CD40L and TCRvα2 BV480, ICOS-L, CD45RA, CD28, NKp46 BV510, CD33 and CD19 BV570, BDCA-2 and Tim-3 BV605, Lag-3, CD103 and NKp30 BV650, Tim-3, CCR8, CD101 and CD127 BV711, CD3 Alexa532, CD15, CD96, T-bet, 2B4 and BTLA PerCPCy5.5 (BioLegend), PD-L1, CD39, Eomes and 4-1BB PerCPeFluor710 (BioLegend), CD112, CD226, TCF-1, BTLA, CD160 PE (BioLegend), CD155, CTLA-4 and TCRvα7.2 PE-Dazzle594 (BioLegend), HLA-DR, 4-1BB, CD161 and OX40 PE-Cy5 (BD Biosciences), CD68 and TCRγδ1 PE-Cy7 (BioLegend), VISTA, CRTAM, granzyme A, CXCL-13 APC (Thermo Fisher Scientific), CD38 APC/Cy5.5 (Thermo Fisher Scientific), CD11c, granzyme B, NKG2A Alexafluor700 (BD Biosciences), CD112R Alexafluor700 (Biotechne), CD83, CCR7, perforin and CD57 APC/Fire750 (BioLegend). Spectral flow cytometry was carried out on a Cytek Aurora flow cytometer (Cytek Biosciences, Fremont, CA, USA). Supervised analysis was performed with FlowJo (BD Biosciences) for fine adjustments of channel spillovers and live cell subset extraction for unsupervised analysis. Unsupervised analysis was performed using the R Programming Language v3.6.0 with the CATALYST package v1.8.7, using a modified version of a previously published procedure (20, 21). Briefly, marker expression was transformed using arcsinh with a cofactor of 150. Samples were z-scored per batch to remove batch effects. Events that were more than five standard deviations away from the mean were removed. Events from all samples were clustered per panel and manually labeled based upon their mean fluorescence intensity (MFI) of lineage and differentiation markers. Clusters with the same label were combined. Visualization was performed using Uniform Manifold Approximation and Projection (UMAP) reduction. The frequency of cells for each sample was calculated by dividing the number of cells in a cluster by the total number of cells for that sample. To evaluate differences in cell frequency, unpaired t-tests were performed between the abundance of Rs and NRs for each cell type. For each cluster, unpaired t-tests were performed between the median expression of Rs and NRs.
+
+FACS data request on its way
+
+### Metagenomic
+
+> **DNA Extraction and Shotgun Metagenomic Sequencing and Analysis** Total metagenomic DNA was extracted from stool samples using the MO BIO PowerSoil DNA Isolation Kit (MO BIO Laboratories, Carlsbad, CA, USA) and Epmotion 5075 liquid handling robot (Eppendorf). The DNA library was prepared using the Nextera DNA Flex Library Prep Kit, quantified using Qbit, and sequenced on the NovaSeq System (Illumina, Inc, San Diego, CA, USA) using the 2×150 base pair (bp) paired-end protocol. For each shotgun metagenomic sample, after quality trimming and adapter clipping with Trimmomatic 0.36 (44), raw reads were aligned against the human genome to filter out human reads with Bowtie2 v2.3.2 (45). Leftover (non-host) reads were assembled using MEGAHIT v1.2.9 (46). Resulting assembly contigs <500 bp were discarded. For the 216 samples sequenced, the mean number of non-human bp used for assembly into contigs was 2.73 Gbp ± 0.78 Gbp, yielding a mean assembly rate of 78.27% ± 7.48%. Contigs were classified taxonomically by k-mer analysis using Kraken2 (47), with a custom 96-Gb Kraken2 database built with draft and complete genomes of all bacteria, archaea, fungi, viruses, and protozoa available in the NCBI GenBank in April 2020, in addition to human and mouse genomes. Contigs were annotated ab initio with Prokka v1.14.6 (48). Then reads used for assembly were aligned back to the assembly contigs to gauge sequencing depth of each contig. Unassembled reads were retrieved and classified one by one using Kraken2 on the same database. Taxonomic classifications were expressed as the last known taxon (LKT), which is the lowest unambiguous classification known for the query sequence, using Kraken’s confidence scoring threshold of 5e-06 (using the –confidence parameter). In each sample, relative abundance for each LKT was calculated by dividing the number of bp covering all contigs and unassembled reads classified as that LKT by the total number of host-filtered bp used for assembly in that sample. This ratio was multiplied by 106 to yield relative abundance in parts per million (PPM).For beta analysis, ordination plots were done using t-distributed stochastic neighbor embedding (t-SNE) implemented via the uwot package in R (https://github.com/jlmelville/uwot) and the ggplot2 library. Heatmaps were drawn using the ComplexHeatmap package for R (49). All codes used for shotgun sequencing analysis can be found within the in-house JAMS_BW package, version 1.5.5, publicly available on GitHub (https://github.com/johnmcculloch/JAMS_BW). Meta-analysis of microbiome associated with the response was done as follows. Individual Rs were first analyzed using the non-parametric t-test. Then p-values and ratios were combined using Fisher’s method and R package meta (https://github.com/guido-s/meta). Resultant data were visualized using the cladogram feature from package LEfSe (50).
+
+Metagenomic data acquisition is done by Vastbiome CompTeam
+
+### Human Genetic and RNA-Seq
+
+not done
+
+### scRNA-Seq
+
+> **Single-cell RNA Sequencing of Tumor Samples ** FACS-isolated CD45+cells from tumor biopsies were processed using 10X Genomics’ Chromium platform for droplet-based single-cell RNA sequencing (scRNA-seq). Eleven samples were collected at day 0, nine samples were collected around day 56, and one sample was collected at day 129. Gene expression libraries were generated using the Chromium Single Cell 5’ Library Construction Kit (v1.0 chemistry, PN-1000006) following the CG000086 user guide. Each library was sequenced on the Illumina NovaSeq 6000 System with a PE150 configuration to a target depth of 50 k read pairs per cell. Sequenced gene expression libraries were aligned to the GRCh38-2020-A reference genome using 10X Genomics’ Cell Ranger count v4.0.0 with default settings. Cell count matrices were loaded into R and processed using the standard workflow of Seurat v3.2.0 (29). Feature counts were normalized using NormalizeData with default settings. This function divides the feature counts of each cell by the total counts for that cell, multiplied by 10,000, followed by taking the natural log. Then T and B cell V, D, J, and C genes were removed to prevent clustering by clonotype. Any gene with the following prefixes were removed: TRA(VDJC)-, TRB(VDJC)-, TRD(VDJC)-, TRG(VDJC)-, IGH(VDJC)-, IGL(VDJC)-, IGK(VDJC)-. Cells were removed in which the percentage of reads that aligned to the mitochondrial genome was greater than 10%. To exclude empty droplets and multiplets, cells with unique feature counts less than 200 or greater than 3000 were excluded. Any sample that had fewer than 300 cells after the previous quality control step was removed. Variable gene features were identified using FindVariableFeatureswith default settings. Batch effects were removed using FindIntegrationAnchors and IntegrateData with default settings. Integrated expression data were scaled and centered using ScaleData with default settings. Clustering was performed using FindNeighbors and FindClusters using default settings. Each cluster was identified based upon gene expression. To facilitate this process, differential gene expression between each cluster and all other clusters was performed using FindMarkers with a min.pct=0.25. Two clusters that were identified as melanoma contamination (SPP1high, APODhigh) and one cluster that was likely dead or dying cells were removed. Clusters identified as the same cell type were merged. The top 50 genes for each cell type after this process are shown in Table S4. At this point, samples that contained fewer than 300 cells were removed because of potential bias they could introduce in abundance calculations. A UMAP projection was calculated using RunPCA and RunUMAP. Abundance for each sample was calculated by dividing the number of cells of a particular cell type by the total number of cells for that sample. Unpaired t-tests between Rs and NRs were performed for each cell type before and after (day 56) treatment. Uncorrected p-values were reported due to the low number of samples. Phenotype differences between Rs and NRs were calculated by only selecting cells from samples collected post-treatment (day 56) and running FindMarkers on each cell type between cells from Rs and NRs.
+
+Seurat tables may be available upon request.
+
+### Proteomic
+
+not done
+
+### Metabolomic
+
+> **Metabolome and Lipidome Analysis ** Samples were analyzed by Metabolon, Inc. (Durham, NC, USA). Serum samples were analyzed using liquid chromatography-tandem mass spectrometry and gas chromatography-mass spectrometry. Peaks were identified using Metabolon’s proprietary chemical reference library. R esultant chemicals were mapped to known classes of biological molecules and metabolic pathways using the Kyoto Encyclopedia of Genes and Genomesdatabase. Both lipidomic and metabolomic datasets were log2-transformed and quantile-normalized, and statistical tests were performed (PCA, ANOVA, t-test). Data were analyzed and visualized using Partek Genomic suite 6.0(Partek Inc.).
+
+Data may be available upon request
+
+# Metadata from Spencer 2021
+Paper info:
+Title: Dietary fiber and probiotics influence the gut microbiome and melanoma immunotherapy response
+DOI: https://www.science.org/doi/10.1126/science.aaz7015
+First Author: Christine N. Spencer
+Last Authors: Giorgio Trinchieri, Carrie R. Daniel, Jennifer A. Wargo
+Affiliation: MD Anderson
+
+### Is there any _clinical_ annotation from patients?
+
+There is evidence of patient-level annotation in the paper based on summary tables, but there is no public access to patient-level data.
+
+Clinical data include
+
+* RECIST 1.1 values
+* Clinician classification of R/NR based on CT values and RECITS 1.1 data
+* TMB
+* PD-L1 staining value (binary: <1% >1%)
+
+> *From Method*: Response (R) was defined by radiographic evidence of complete response, partial response or stable disease (for at least 6 months) per RECIST 1.1 criteria. Lack of a clinical response (non-responder, NR) was defined by disease progression (PD) on serial CT scans or stable disease lasting less than 6 months. Progression-free survival (PFS) was defined as the interval of time from treatment start to treatment progression (via scans or clinically determined) or the date of death. Otherwise patients were censored at the time of their last visit to the clinic through September 3, 2020 (date of follow-up assessment).
+
+I ask Comp Team about data that may be coming from MD Anderson --> Asked @Ayin
+
+## Is there presence of any other metadata from the paper?
+
+### FACS
+
+No human data
+
+### Metagenomic
+
+> **Bacterial DNA extraction and 16S rRNA gene sequencing:** Sample preparation and sequencing was performed across the entire melanoma patient cohort (n=438, one sample per patient). The 16S-V4 amplification protocol was adapted from those described in Earth Microbiome Project i.e.,primers 515f/806r (45, 46). Briefly, genomic DNA was extracted using Qiagen/MO BIO PowerMicrobiome DNA isolation kit on automated liquid handlers (Hamilton STARlet instruments). The 16S rRNAgeneV4 region was amplified by PCR and sequenced on the MiSeq platform (Illumina, Inc, San Diego, CA) using the 2x250 bp paired-end protocol yielding paired-end reads with near-complete overlap. The primers used for amplification contain adapters for MiSeq sequencing and single-end barcodes allowing pooling and direct sequencing of PCR products (46).
+
+> **Metagenomic data generation for human studies:**  For the human stool samples, individual sequencing libraries were constructed from each sample then pooled and loaded onto the Illumina HiSeq2000 platform in 200 cycle runs. At CosmosID, extracted DNA from BCM-CMMR (Baylor College of Medicine Alkek Center for Metagenomics and Microbiome Research) were quantified using Qubit4 and individual sequencing libraries were prepared and sequenced on the Illumina NextSeq 550 or HiSeq X platform in two separate 300 cycle runs. Raw FASTQ files were made available through CosmosID client portal.
+
+Metagenomic data acquisition is done by Vastbiome CompTeam
+
+### Human Genetic and RNA-Seq
+
+It appears that MD Anderson performs a routine WGS on resected tumours to estimate global mutational burden
+
+> **TMB estimation in Lifestyle ICB cohort patients:** Data from targeted whole genome sequencing performed as part of routine clinical care at MD Anderson was abstracted from the medical record when available. Predicted tumor mutational burden (TMB) was derived from targeted whole genome sequencing data as previously described, using an algorithm which calculates the predicted TMB using the weighted scores of specific genes mutated in a given tumor. TMB was classified as either high (≥100) or low (<100) predicted mutations as previously described (44).
+
+> **PD-L1 staining in Lifestyle ICB cohort patients:** For patients with available tumor tissue, tumor PD-L1 was quantified via immunohistochemical studies performed using the FDA approved Dako pharmDx PD-L1 (clone 28-8, Dako/Agilent Technologies, Carpinteria, CA) on Dako Autostainer Link 48 autostainer (Dako/Agilent Technologies, Carpinteria, CA) and antigen retrieval with PT Link with Target Retrieval Solution, low pH (Dako/Agilent Technologies, Carpinteria, CA) as specified by the manufacturer. PD-L1 was classified as ≥1% vs.<1%.
+
+Data was obtained from MD-Anderson before VB presentation to them in February. Indentify table location with Comp Team.
+--> emailed MD Anderson contact about this
+
+### scRNA-Seq
+
+not done
+
+### Proteomic
+
+not done
+
+### Metabolomic
+
+not done
+
